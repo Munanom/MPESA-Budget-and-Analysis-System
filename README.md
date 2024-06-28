@@ -5,14 +5,14 @@ It categorizes transactions into different categories like Grocery, Travelling, 
 
 ## Features
 
-- Extract M-Pesa transaction messages from an Excel file
+- Extract M-Pesa transaction messages from an Excel file or from the Sqlite database
 - Categorize transactions based on a predefined set of categories
 - Analyze transaction details like user, payment amount, transaction cost, and date
 - Generate a PDF report of the transactions
   
 ## Instructions:
 
-Replace 'your_file.xlsx' with the actual file path of your Excel file containing MPesa transaction data.
+Replace 'your_file.xlsx' with the actual file path of your Excel file containing MPesa transaction data or configure sqlite to the Mpesa transactions details.
 Make sure you have the necessary Python libraries installed, including pandas.
 Run the script to extract and analyze MPesa transaction data.
 
