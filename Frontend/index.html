@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles/styles.css" />
+    <link rel="stylesheet" href="./styles/media.css" />
+    <link
+      rel="shortcut icon"
+      href="./pages/Dashboard/assets/favicon.svg"
+      type="image/x-icon"
+    />
+    <script src="https://unpkg.com/feather-icons"></script>
+    <title>Monances App</title>
+  </head>
+  <body>
+    <header class="container">
+      <nav>
+        <div class="logo">
+          <p>monances</p>
+        </div>
+
+        <div class="buttons">
+          <a href="#contact" class="button contact">Register</a>
+          <a href="./pages/Dashboard/dashboard.html" class="button get-started"
+            >Dashboard</a
+          >
+        </div>
+        
+        <div class="mobile-menu">
+          <div class="open-close">
+            <img
+              src="./images/menu.svg"
+              alt="Abrir"
+              class="open"
+              onclick="Menu.open()"
+            />
+            <img
+              src="./images/close.svg"
+              alt="fechar"
+              class="close"
+              onclick="Menu.close()"
+            />
+
+            <div class="logo-menu">
+              <img src="./images/logo.svg" alt="" />
+              <p>Monances</p>
+            </div>
+          </div>
+          <div class="menu">
+            <div class="menu-open">
+              <div class="menu-items">
+                <ul>
+                  <li><a href="./index.html" onclick="Menu.close()">Home</a></li>
+                  <li><a href="#contact" onclick="Menu.close()">Register</a></li>
+                  <li>
+                    <a
+                      href="./pages/Dashboard/dashboard.html"
+                      onclick="Menu.close()"
+                      >Get Started</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="header-content">
+        <div class="header-content-left">
+          <h1>Your best financial life starts here.</h1>
+          <p>
+            A smart, easy-to-use app that allows you to track your in-and-out
+            money.
+          </p>
+          <a href="./pages/Dashboard/dashboard.html" class="button get-started"
+            >Go to Dashboard</a
+          >
+        </div>
+
+        <div class="header-content-right">
+          <img src="./images/team.svg" alt="Team image" />
+        </div>
+      </div>
+    </header>
+    <!--END OF HEADER-------------------- -->
+
+    <main id="preview">
+      <section class="app-preview container">
+        <div class="app-preview-left">
+          <img src="./images/laptop_preview.svg" alt="App image" />
+        </div>
+
+        <div class="app-preview-right">
+          <h2 class="section-title">Spend smarter and save more</h2>
+          <p class="section-paragraph">
+            Say goodbye to spreadsheets with customizable automatic budget analysis. Easily add
+            and update your Incomes and expenses from M-PESA.
+          </p>
+          <div class="get-started-line">
+            <a href="./pages/Dashboard/dashboard.html" class="get-started"
+              >Get Started</a
+            >
+            <div class="green-line"></div>
+          </div>
+        </div>
+      </section>
+      <!--END OF app-preview container SECTION-------------------- -->
+
+      <section class="track-your-spending container" id="track">
+        <div class="track-your-spending-left">
+          <h2 class="section-title">Track your spending</h2>
+          <p class="section-paragraph">
+            Reach your goals with custom budgets, monitoring your incomes and
+            expenses everyday, All automated and for free.
+          </p>
+          <div class="get-started-line">
+            <a href="./pages/Dashboard/dashboard.html" class="get-started"
+              >Get Started</a
+            >
+            <div class="green-line"></div>
+          </div>
+        </div>
+
+        <div class="track-your-spending-right">
+          <img src="./images/idea.svg" alt="image" />
+        </div>
+      </section>
+
+      <!--END OF track-your-spending SECTION-------------------- -->
+      
+      <style>
+        body {
+          font-family: 'Arial', sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f4f4f4;
+        }
+    
+        .popup-container {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: #fff;
+          padding: 30px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+        }
+    
+        .popup-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        }
+    
+        .button {
+          display: inline-block;
+          padding: 15px 30px;
+          font-size: 18px;
+          text-align: center;
+          text-decoration: none;
+          background-color: #3498db;
+          color: #fff;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+    
+        form {
+          margin-top: 20px;
+        }
+    
+        label {
+          display: block;
+          margin-bottom: 8px;
+          font-size: 16px;
+        }
+    
+        input {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 20px;
+          box-sizing: border-box;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 16px;
+        }
+    
+        input[type="submit"] {
+          background-color: #4caf50;
+          color: white;
+          cursor: pointer;
+        }
+    
+        input[type="submit"]:hover {
+          background-color: #45a049;
+        }
+    
+        button {
+          background-color: #ccc;
+          color: #000;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 16px;
+        }
+    
+        button:hover {
+          background-color: #999;
+        }
+      </style>
+    </head>
+    <body>
+      <section id="contact" class="get-in-touch container">
+        <div class="get-in-touch-content">
+          <div class="get-in-touch-left">
+            <h2 class="section-title">Register to begin your journey.</h2>
+          </div>
+          <div class="get-in-touch-right">
+            <div class="popup-overlay" id="overlay"></div>
+            <div class="popup-container" id="popup">
+              <h2>Registration Form</h2>
+              <form>
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" name="fullName" required><br>
+      
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" required pattern="[0-9]{10}"><br>
+      
+                <label for="nationalID">National ID:</label>
+                <input type="text" id="nationalID" name="nationalID" required><br>
+      
+                <input type="submit" value="Submit">
+              </form>
+              <button onclick="closeForm()">Close</button>
+            </div>
+            <!-- Add the Register with Google button here -->
+            <button onclick="openForm(); signInWithGoogle()">Register with Google</button>
+          </div>
+        </div>
+      </section>
+      
+      <script src="https://apis.google.com/js/platform.js" async defer></script>
+      <meta name="google-signin-client_id" content="570977714124-1uad7s5m70jc7d0ba17ilm5i91s2cfb4.apps.googleusercontent.com">
+      
+      <script>
+        function openForm() {
+          document.getElementById("popup").style.display = "block";
+          document.getElementById("overlay").style.display = "block";
+        }
+      
+        function closeForm() {
+          document.getElementById("popup").style.display = "none";
+          document.getElementById("overlay").style.display = "none";
+        }
+      
+        function onSignIn(googleUser) {
+          var profile = googleUser.getBasicProfile();
+          console.log('ID: ' + profile.getId());
+          console.log('Name: ' + profile.getName());
+          console.log('Image URL: ' + profile.getImageUrl());
+          console.log('Email: ' + profile.getEmail());
+        }
+      
+        function signOut() {
+          var auth2 = gapi.auth2.getAuthInstance();
+          auth2.signOut().then(function () {
+            console.log('User signed out.');
+          });
+        }
+      
+        function signInWithGoogle() {
+          gapi.auth2.getAuthInstance().signIn().then(onSignIn);
+        }
+      </script>
+
+
+      <!--END OF get-in-touch SECTION-------------------- -->
+    </main>
+
+    <footer>
+      <div class="footer-container">
+        <div class="footer-card">
+          <h3>Our mission</h3>
+          <a href="./index.html">Home</a>
+          <a href="#preview">Preview</a>
+          <a href="#track">Track spending</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div class="footer-card">
+          <h3>About</h3>
+          <a href="https://github.com/viniscode" target="_blank">Munanomy</a>
+          <a href="https://github.com/viniscode/Monances" target="_blank"
+            >Source code</a
+          >
+        </div>
+        <div class="footer-card">
+          <h3>Quick Links</h3>
+          <a href="./index.html">Home</a>
+          <a href="#preview">Preview</a>
+          <a href="#track">Track spending</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+        <div class="footer-card">
+          <h3>Get in touch</h3>
+          <div class="social">
+            <a
+              href="https://www.linkedin.com/in/vinicius-rodrigues-5897831b8/"
+              target="_blank"
+              id="linkedin"
+              ><i data-feather="linkedin"></i
+            ></a>
+            <a href="https://github.com/viniscode" target="_blank"
+              ><i data-feather="github" id="git"></i
+            ></a>
+            <a
+              href="https://instagram.com/rodriguesvini.dev"
+              target="_blank"
+              id="insta"
+              ><i data-feather="instagram"></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!--END OF FOOTER-------------------- -->
+
+    <!--LOADING SCREEN-->
+    <div class="loader-overlay">
+      <div class="loader"></div>  
+    </div>
+    
+
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="scrollReveal.js"></script>
+    <script src="home.js"></script>
+    <script>
+      feather.replace();
+    </script>
+
+  <script>
+    // ==== LOADING SCREEN
+    let spinner = document.querySelector('.loader-overlay');
+
+    window.addEventListener('load', () => {
+      spinner.parentElement.removeChild(spinner);
+    })
+  </script>
+  </body>
+</html>
