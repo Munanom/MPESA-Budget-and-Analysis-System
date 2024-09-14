@@ -7,7 +7,7 @@ from uuid import uuid4
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse, FileResponse
 import pdfkit
-
+import sqlite3
 
 app = FastAPI()
 
@@ -27,14 +27,22 @@ app.add_middleware(
     
 )
 
-# extracts mpesa messages from all messages and categorize based on groceries etc
+# # extracts mpesa messages from all messages and categorize based on groceries etc
+# def get_mpesa_message():
+#     df = pd.read_excel("/Users/munanuman/Documents/sch/iMessage-Data.xlsx")
+#     df = df[df['User_ID']=="MPESA"]
+
 def get_mpesa_message():
-    df = pd.read_excel("/Users/munanuman/Documents/sch/iMessage-Data.xlsx")
-    df = df[df['User_ID']=="MPESA"]
+    conn = sqlite3.connect("/Users/munanuman/Documents/iMessage-Data.sqlite")
+    query = """
+        SELECT message, date FROM Messages WHERE user_id = 'MPESA';
+    """
+    df = pd.read_sql_query(query, conn)
+    conn.close()
 
     random.seed(30)
     df['category'] = [random.choice( ["Grocery", "Travelling", "Miscellaneous", "House expenses"]) for _ in range(len(df))]
-    df = df[['Message', 'Date', 'category']]
+    df = df[['message', 'date', 'category']]
 
     return df
 
@@ -44,47 +52,68 @@ def monance_data(messages):
     monance = {}
     payments = []
     transactions = []
-    dates_list = list(messages['Date'])
+    dates_list = list(messages['date'])
     category_list = list(messages['category'])
 
-    for message, date, category in zip(messages['Message'], dates_list, category_list):
+    for message, date, category in zip(messages['message'], dates_list, category_list):
 
         if isinstance(message, str):
             m = message.split()[2:]
 
+            # Check if the message contains "sent"
             if m[1] == "sent":
-                user = re.search(r"sent to ([\w\s]+?)\s\d", message).group(1)
-                payment = float(m[0][3:].replace(',', ''))
-                payments.append(payment)
+                # Safely search for the user in the message
+                user_match = re.search(r"sent to ([\w\s]+?)\s\d", message)
                 
-                transaction_cost_match = re.search(r'Transaction cost, Ksh([\d,.]+)', message)
-                
-                if transaction_cost_match:
-                    transaction_cost = float(transaction_cost_match.group(1).replace(',', '').rstrip('.'))
-                    transactions.append(transaction_cost)
+                if user_match:
+                    user = user_match.group(1)
+                    payment = float(m[0][3:].replace(',', ''))
+                    payments.append(payment)
                     
-                else:
-                    transaction_cost = 0.0
-                UUID = str(uuid4())[:18].upper()
-                monance[UUID] = {'payment': payment, 'user': user, 'date': date, 'transaction_cost': transaction_cost, 'category': category}
-
+                    transaction_cost_match = re.search(r'Transaction cost, Ksh([\d,.]+)', message)
+                    
+                    if transaction_cost_match:
+                        transaction_cost = float(transaction_cost_match.group(1).replace(',', '').rstrip('.'))
+                        transactions.append(transaction_cost)
+                    else:
+                        transaction_cost = 0.0
+                    
+                    UUID = str(uuid4())[:18].upper()
+                    monance[UUID] = {
+                        'payment': payment, 
+                        'user': user, 
+                        'date': date, 
+                        'transaction_cost': transaction_cost, 
+                        'category': category
+                    }
+                
+            # Check if the message contains "paid"
             elif m[1] == "paid":
-                user = re.search(r"paid to ([\w\s]+)\.", " ".join(m[:9])).group(1)
-                payment = float(m[0][3:].replace(',', ''))
-                payments.append(payment)
+                user_match = re.search(r"paid to ([\w\s]+)\.", " ".join(m[:9]))
                 
-                transaction_cost_match = re.search(r'Transaction cost, Ksh([\d,.]+)', message)
-                
-                if transaction_cost_match:
-                    transaction_cost = float(transaction_cost_match.group(1).replace(',', '').rstrip('.'))
-                    transactions.append(transaction_cost)
-                else:
-                    transaction_cost = 0.0
-                UUID = str(uuid4())[:18].upper()
-                monance[UUID] = {'payment': payment, 'user': user, 'date': date,'transaction_cost': transaction_cost, 'category': category}#extract 
+                if user_match:
+                    user = user_match.group(1)
+                    payment = float(m[0][3:].replace(',', ''))
+                    payments.append(payment)
+                    
+                    transaction_cost_match = re.search(r'Transaction cost, Ksh([\d,.]+)', message)
+                    
+                    if transaction_cost_match:
+                        transaction_cost = float(transaction_cost_match.group(1).replace(',', '').rstrip('.'))
+                        transactions.append(transaction_cost)
+                    else:
+                        transaction_cost = 0.0
+                    
+                    UUID = str(uuid4())[:18].upper()
+                    monance[UUID] = {
+                        'payment': payment, 
+                        'user': user, 
+                        'date': date,
+                        'transaction_cost': transaction_cost, 
+                        'category': category
+                    }
 
     return monance, payments, transactions
-
 
 #api based on request 
 @app.get("/")

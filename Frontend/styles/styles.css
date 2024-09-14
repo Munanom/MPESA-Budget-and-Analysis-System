@@ -76,7 +76,7 @@ nav {
 .buttons > .button.contact {
   border: 1px solid var(--primary-color);
   border-radius: var(--btn-radius);
-  color: var(--primary-color);
+  color: #ffffff;
 }
 
 .buttons > .button.get-started {
@@ -481,5 +481,28 @@ footer {
   border-radius: 50%;
   z-index: 1;
   filter: blur(30px);
+}
+
+.google-signin-btn {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  color: #757575;
+  border: 1px solid #d9d9d9;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.google-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.google-signin-btn:hover {
+  background-color: #f5f5f5;
 }
 
