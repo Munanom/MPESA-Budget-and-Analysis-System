@@ -1,0 +1,42 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment folder
+venv/
+env/
+.venv/
+
+# SQLite database files
+*.sqlite
+*.db
+
+# Logs
+*.log
+
+# PDF files (if they are generated and not source files)
+*.pdf
+
+# Excel files
+*.xlsx
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Config and environment files
+.env
+
+# PyTest cache
+.pytest_cache/
+
+# FastAPI specific
+*.pem  # SSL certificate files if using HTTPS
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store  # macOS
+Thumbs.db  # Windows

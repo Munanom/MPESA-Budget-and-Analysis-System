@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 """
-cli.py
-Entrypoint to the command line interface.
-Python 3.9+
-Date created: October 15th, 2020
-Date modified: June 2nd, 2023
+Command-line tool for fetching and processing messages from the chat.db file on macOS.
+This script provides functionalities to extract messages from the macOS Messages database (`chat.db`) and export the data in various formats or display specific information.
+
+Modules:
+    argparse -- For parsing command-line arguments.
+    os -- For interacting with the operating system.
+    sys -- For system-specific parameters and functions.
+    imessage_reader -- Custom module for fetching and processing iMessage data.
+
+Constants:
+    MACOS_DB_PATH (str): Default path to the chat.db file on macOS.
+
+Functions:
+    get_parser() -- Creates and returns an argument parser for the CLI.
+    check_database_path(args) -- Validates the database path and invokes the evaluation function.
+    evaluate(path: str, output: str, recipients: bool, version: bool) -- Processes the database according to the provided options.
+    main() -- Entry point for the CLI.
 """
 
 import argparse
@@ -28,6 +39,7 @@ def get_parser() -> argparse.ArgumentParser:
     """Create the argument parser
 
     :rtype: object
+    :return: Configured ArgumentParser object.
     """
     parser = argparse.ArgumentParser(
         description="A tool to fetch messages from the chat.db file."
@@ -83,12 +95,13 @@ def check_database_path(args):
 
 
 def evaluate(path: str, output: str, recipients: bool, version: bool):
-    """Evaluate the given options and perform the appropriate actions.
-
-    :param path: path to the chat.db file
-    :param output: create an Excel/SQLite3 file
-    :param recipients: recipients of the messages
-    :param version: specify if the version of this program should be shown
+    """
+    Processes the database based on user options.
+    
+    :param path: Path to the chat.db file.
+    :param output: Output format.
+    :param recipients: Flag to show recipients.
+    :param version: Flag to show version.
     """
     data = fetch_data.FetchData(path)
 
@@ -114,7 +127,6 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     check_database_path(args)
-
 
 if __name__ == "__main__":
     main()

@@ -6,14 +6,11 @@ Python 3.9+
 """
 
 from datetime import datetime
-
 import openpyxl
 from openpyxl.styles import Font
 
-
 class ExelWriter:
-    """This class manages the export to excel.
-    """
+    """Handles exporting iMessage data to an Excel file."""
 
     def __init__(self, imessage_data: list, file_path: str):
         """Constructor method
@@ -26,100 +23,44 @@ class ExelWriter:
         self.file_path = file_path
 
     def write_data(self):
-        """Write data to Excel
-        (user id, text, date, service, account, is_from_me)
-        """
+        """Writes the iMessage data to an Excel file."""
 
-        users = []
-        messages = []
-        dates = []
-        services = []
-        accounts = []
-        is_from_me = []
+        # Prepare data lists
+        users = [data.user_id for data in self.imessage_data]
+        messages = [data.text for data in self.imessage_data]
+        dates = [data.date for data in self.imessage_data]
+        services = [data.service for data in self.imessage_data]
+        accounts = [data.account for data in self.imessage_data]
+        is_from_me = [data.is_from_me for data in self.imessage_data]
 
-        for data in self.imessage_data:
-            users.append(data.user_id)
-            messages.append(data.text)
-            dates.append(data.date)
-            services.append(data.service)
-            accounts.append(data.account)
-            is_from_me.append(data.is_from_me)
-
-        # Call openpyxl.Workbook() to create a new blank Excel workbook
+        # Create and configure Excel workbook
         workbook = openpyxl.Workbook()
-
-        # Activate a sheet
         sheet = workbook.active
-
-        # Set a title
         sheet.title = "iMessages"
 
-        # Set headline style
+        # Set header style
         bold16font = Font(size=16, bold=True)
 
-        sheet["A1"] = "User ID"
-        sheet["A1"].font = bold16font
+        # Write headers
+        headers = ["User ID", "Message", "Date", "Service", "Destination Caller ID", "Is From Me"]
+        for col, header in enumerate(headers, start=1):
+            sheet.cell(row=1, column=col, value=header).font = bold16font
 
-        sheet["B1"] = "Message"
-        sheet["B1"].font = bold16font
-
-        sheet["C1"] = "Date"
-        sheet["C1"].font = bold16font
-
-        sheet["D1"] = "Service"
-        sheet["D1"].font = bold16font
-
-        sheet["E1"] = "Destination Caller ID"
-        sheet["E1"].font = bold16font
-
-        sheet["F1"] = "Is From Me"
-        sheet["F1"].font = bold16font
-
-        # Write users to 1st column
-        users_row = 2
-        for user in users:
-            sheet.cell(row=users_row, column=1).value = user
-            users_row += 1
-
-        # Write messages to 2nd column
-        messages_row = 2
-        for message in messages:
-            sheet.cell(row=messages_row, column=2).value = message
-            messages_row += 1
-
-        # Write date to 3rd column
-        dates_row = 2
-        for date in dates:
-            sheet.cell(row=dates_row, column=3).value = date
-            dates_row += 1
-
-        # Write services to 4th column
-        service_row = 2
-        for service in services:
-            sheet.cell(row=service_row, column=4).value = service
-            service_row += 1
-
-        # Write accounts to 5th column
-        account_row = 2
-        for account in accounts:
-            sheet.cell(row=account_row, column=5).value = account
-            account_row += 1
-
-        # Write is_from_me to 6th column
-        is_from_me_row = 2
-        for from_me in is_from_me:
-            sheet.cell(row=is_from_me_row, column=6).value = from_me
-            is_from_me_row += 1
+        # Write data to columns
+        for row, (user, message, date, service, account, from_me) in enumerate(zip(users, messages, dates, services, accounts, is_from_me), start=2):
+            sheet.cell(row=row, column=1, value=user)
+            sheet.cell(row=row, column=2, value=message)
+            sheet.cell(row=row, column=3, value=date)
+            sheet.cell(row=row, column=4, value=service)
+            sheet.cell(row=row, column=5, value=account)
+            sheet.cell(row=row, column=6, value=from_me)
 
         # Save the workbook (Excel file)
         try:
-            workbook.save(
-                self.file_path + f'iMessage-Data_{datetime.now().strftime("%Y-%m-%d")}.xlsx'
-            )
-            print()
-            print(">>> Excel file successfully created! <<<")
-            print("You find the Excel file in your Documents folder.")
-            print()
+            file_name = f'iMessage-Data_{datetime.now().strftime("%Y-%m-%d")}.xlsx'
+            workbook.save(self.file_path + file_name)
+            print("\n>>> Excel file successfully created! <<<")
+            print(f"Find the file at: {self.file_path}{file_name}\n")
         except IOError as e:
-            print(">>> Cannot write Excel file! <<<")
+            print("\n>>> Cannot write Excel file! <<<")
             print(e)

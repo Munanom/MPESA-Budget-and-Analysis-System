@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Unit tests for the CreateDatabase class.
+Uses pytest for testing.
+"""
 
 import pytest
 from os import scandir
@@ -9,11 +13,22 @@ from imessage_reader.data_container import MessageData
 
 @pytest.fixture()
 def create_directory(tmpdir):
+    """
+    Fixture to create a temporary directory for testing.
+
+    :param tmpdir: pytest's built-in fixture for temporary directories.
+    :return: Path to the created temporary directory.
+    """
     directory = tmpdir.mkdir("sub/")
     yield directory
 
 
 def message_data_one_row():
+    """
+    Provides a sample MessageData list for testing.
+
+    :return: List containing a single MessageData object.
+    """
     message_data_list = [
         MessageData(
             user_id="max.mustermann@icloud.com",
@@ -28,6 +43,11 @@ def message_data_one_row():
 
 
 def test_create_sqlite(create_directory):
+    """
+    Tests the creation of a SQLite database file.
+
+    :param create_directory: Path to the temporary directory created by the fixture.
+    """
     db_file_path = create_directory + "/db-"
     test_database = CreateDatabase(message_data_one_row(), db_file_path)
     test_database.create_sqlite_db()

@@ -7,13 +7,9 @@ Python 3.9+
 
 from dataclasses import dataclass
 
-
 @dataclass
 class MessageData:
-    """This dataclass is the store for the data:
-    user id, text, date, service and account (caller id).
-    """
-
+    """Stores iMessage data: user ID, text, date, service, account, and sender status."""
     user_id: str
     text: str
     date: str
@@ -22,9 +18,10 @@ class MessageData:
     is_from_me: int
 
     def __str__(self):
-        """String representation
+        """
+        Returns a string representation of the MessageData object.
 
-        :return: the representation of this object
+        :return: Formatted string containing all attributes.
         """
         return (
             f"user id:\t\t{self.user_id}\n"

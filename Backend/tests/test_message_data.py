@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Unit tests for MessageData and database interactions.
+Uses pytest for testing.
+"""
 import pytest
 import os
 import sqlite3
@@ -10,6 +14,11 @@ from imessage_reader.data_container import MessageData
 
 @pytest.fixture()
 def message_data_one_row():
+    """
+    Fixture providing a single MessageData instance for testing.
+
+    :return: A MessageData object with predefined values.
+    """
     return MessageData(
         "max.mustermann@icloud.com",
         "Hello!",
@@ -22,6 +31,12 @@ def message_data_one_row():
 
 @pytest.fixture(scope="function")
 def initialize_db(tmpdir):
+    """
+    Fixture to initialize a SQLite database with a sample message.
+
+    :param tmpdir: pytest's fixture for creating temporary directories.
+    :return: Path to the temporary database file.
+    """
     file = os.path.join(tmpdir.strpath, "chat.db")
     conn = sqlite3.connect(file)
     cur = conn.cursor()
@@ -72,10 +87,20 @@ def initialize_db(tmpdir):
 
 
 def test_message_data(message_data_one_row):
+    """
+    Test that the MessageData object is properly instantiated.
+
+    :param message_data_one_row: A MessageData fixture instance.
+    """
     assert isinstance(message_data_one_row, object)
 
 
 def test_db_data(initialize_db):
+    """
+    Test data retrieval from the SQLite database.
+
+    :param initialize_db: Path to the temporary SQLite database file.
+    """
     sql_command = (
         "SELECT user_id, text, date, service, account, is_from_me, attributedBody, cache_has_attachments from message"
     )

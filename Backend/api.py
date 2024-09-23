@@ -1,4 +1,4 @@
-from fastapi import FastAPI,File, UploadFile, Query, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import re
@@ -8,11 +8,15 @@ from pydantic import BaseModel
 from fastapi.responses import StreamingResponse, FileResponse
 import pdfkit
 import sqlite3
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI()
 
-origins = [
-    
+origins = [  
     "http://localhost",
     "http://localhost:8080",
     "http://localhost:8000/",
@@ -20,35 +24,61 @@ origins = [
 ]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
-    
+    allow_headers=["*"],   
 )
 
-# # extracts mpesa messages from all messages and categorize based on groceries etc
+# Load paths from .env file
+DATABASE_PATH = os.getenv("DATABASE_PATH", "/default/path/to/database.sqlite")
+OUTPUT_PATH = os.getenv("OUTPUT_PATH", "output/")
+
+#  extracts mpesa messages from all messages and categorize based on groceries etc
 # def get_mpesa_message():
 #     df = pd.read_excel("/Users/munanuman/Documents/sch/iMessage-Data.xlsx")
 #     df = df[df['User_ID']=="MPESA"]
 
-def get_mpesa_message():
-    conn = sqlite3.connect("/Users/munanuman/Documents/iMessage-Data.sqlite")
-    query = """
-        SELECT message, date FROM Messages WHERE user_id = 'MPESA';
+def get_db_connection():
     """
-    df = pd.read_sql_query(query, conn)
-    conn.close()
+    Returns an SQLite connection using the specified DATABASE_PATH from environment.
+    """
+    try:
+        conn = sqlite3.connect(DATABASE_PATH)
+        return conn
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database connection error: {e}")
 
-    random.seed(30)
-    df['category'] = [random.choice( ["Grocery", "Travelling", "Miscellaneous", "House expenses"]) for _ in range(len(df))]
-    df = df[['message', 'date', 'category']]
+def get_mpesa_message():
+    """
+    Extracts M-Pesa messages from the database and categorizes them.
+    """
+    try:
+        conn = get_db_connection()
+        query = """
+            SELECT message, date FROM Messages WHERE user_id = 'MPESA';
+        """
+        df = pd.read_sql_query(query, conn)
+        conn.close()
 
-    return df
+        # Randomly assign categories to the messages
+        random.seed(30)
+        df['category'] = [random.choice(["Grocery", "Travelling", "Miscellaneous", "House expenses"]) for _ in range(len(df))]
+        df = df[['message', 'date', 'category']]
+
+        return df
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving M-Pesa messages: {e}")
 
 #analyze mpesa message structure and categorize on structure
 def monance_data(messages):
-
+    """
+    Analyze M-Pesa message structure and categorize based on the structure.
+    Returns:
+        monance (dict): A dictionary of categorized transactions.
+        payments (list): A list of payment amounts.
+        transactions (list): A list of transaction costs.
+    """
     monance = {}
     payments = []
     transactions = []
@@ -62,7 +92,7 @@ def monance_data(messages):
 
             # Check if the message contains "sent"
             if m[1] == "sent":
-                # Safely search for the user in the message
+                # search for the user in the message
                 user_match = re.search(r"sent to ([\w\s]+?)\s\d", message)
                 
                 if user_match:
@@ -115,29 +145,44 @@ def monance_data(messages):
 
     return monance, payments, transactions
 
-#api based on request 
 @app.get("/")
-async def root(dateq: str = "", category: str ="", pdf: str = ""):
-    messages = get_mpesa_message()
+async def root(dateq: str = "", category: str = "", pdf: str = ""):
+    """
+    API root endpoint to retrieve and filter M-Pesa messages, with optional PDF generation.
+    Query Params:
+        dateq (str): Optional date filter in 'YYYY-MM-DD' format.
+        category (str): Optional category filter (e.g., Grocery, Travelling).
+        pdf (str): If provided, generates and returns a PDF file of the filtered transactions.
+    """
+    try:
+        messages = get_mpesa_message()
 
-    if dateq:
-        messages["Date"] = pd.to_datetime(messages["Date"])
-        messages = messages[messages['Date'] >= pd.to_datetime(dateq)]
-    
-    if category:
-        messages = messages[messages['category'] == category]
+        # Apply date filter if provided
+        if dateq:
+            messages["date"] = pd.to_datetime(messages["date"])
+            messages = messages[messages['date'] >= pd.to_datetime(dateq)]
 
-    monance, payments, transactions = monance_data(messages)
-    response = {
-        "messages": monance,
-        "total_transactions": sum(transactions),
-        "total_payments": sum(payments),
-         "total_expense": sum(payments + transactions)
-    }
-    if pdf:
-        df=pd.DataFrame(monance).T
-        df.to_html("output/monance.html")
-        pdfkit.from_file("output/monance.html", "output/monance.pdf")
-        return FileResponse("output/monance.pdf", media_type= "application/pdf" , filename="downloadfile.pdf")
-        
-    return response
+        # Apply category filter if provided
+        if category:
+            messages = messages[messages['category'] == category]
+
+        monance, payments, transactions = monance_data(messages)
+        response = {
+            "messages": monance,
+            "total_transactions": sum(transactions),
+            "total_payments": sum(payments),
+            "total_expense": sum(payments + transactions)
+        }
+
+        # Generate and return PDF if requested
+        if pdf:
+            df = pd.DataFrame(monance).T
+            output_html_path = os.path.join(OUTPUT_PATH, "monance.html")
+            output_pdf_path = os.path.join(OUTPUT_PATH, "monance.pdf")
+            df.to_html(output_html_path)
+            pdfkit.from_file(output_html_path, output_pdf_path)
+            return FileResponse(output_pdf_path, media_type="application/pdf", filename="downloadfile.pdf")
+
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
